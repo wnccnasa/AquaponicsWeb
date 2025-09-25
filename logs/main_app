@@ -6,3 +6,17 @@
 2025-09-25 07:52:20,756 ERROR [BroadcastCamera] Upstream error http://172.16.1.200:8000/stream1.mjpg: HTTPConnectionPool(host='172.16.1.200', port=8000): Max retries exceeded with url: /stream1.mjpg (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x0000023417BAF460>, 'Connection to 172.16.1.200 timed out. (connect timeout=10)'))
 2025-09-25 07:52:47,839 ERROR [BroadcastCamera] Upstream error http://172.16.1.200:8000/stream0.mjpg: HTTPConnectionPool(host='172.16.1.200', port=8000): Max retries exceeded with url: /stream0.mjpg (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x0000023417BAF8A0>, 'Connection to 172.16.1.200 timed out. (connect timeout=10)'))
 2025-09-25 07:52:47,844 ERROR [BroadcastCamera] Upstream error http://172.16.1.200:8000/stream1.mjpg: HTTPConnectionPool(host='172.16.1.200', port=8000): Max retries exceeded with url: /stream1.mjpg (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x0000023417BAF790>, 'Connection to 172.16.1.200 timed out. (connect timeout=10)'))
+2025-09-25 07:53:21,848 INFO Application start
+2025-09-25 07:53:21,942 INFO Serving on http://127.0.0.1:19733
+2025-09-25 07:53:22,189 INFO Connecting to upstream camera: http://10.0.0.2:8000/stream0.mjpg
+2025-09-25 07:53:22,190 INFO Frame cache started for http://10.0.0.2:8000/stream0.mjpg (delay=2.0s)
+2025-09-25 07:53:22,190 INFO Cached media relay started for http://10.0.0.2:8000/stream0.mjpg
+2025-09-25 07:53:22,190 INFO [CachedRelayFactory] Created http://10.0.0.2:8000/stream0.mjpg
+2025-09-25 07:53:22,191 INFO Client added. Total clients: 1 for http://10.0.0.2:8000/stream0.mjpg
+2025-09-25 07:53:22,191 INFO Connecting to upstream camera: http://10.0.0.2:8000/stream1.mjpg
+2025-09-25 07:53:22,191 INFO Frame cache started for http://10.0.0.2:8000/stream1.mjpg (delay=2.0s)
+2025-09-25 07:53:22,192 INFO Cached media relay started for http://10.0.0.2:8000/stream1.mjpg
+2025-09-25 07:53:22,192 INFO [CachedRelayFactory] Created http://10.0.0.2:8000/stream1.mjpg
+2025-09-25 07:53:22,192 INFO Client added. Total clients: 1 for http://10.0.0.2:8000/stream1.mjpg
+2025-09-25 07:53:22,203 INFO Connected to upstream camera successfully
+2025-09-25 07:53:22,203 INFO Connected to upstream camera successfully
