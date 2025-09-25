@@ -53,4 +53,6 @@
 
 - **waitress_app.py**: Sets up and runs a Waitress WSGI server to serve the Flask web application. It configures logging and ensures the app can be deployed in a production environment.
 
----
+## Installation Steps
+
+WE are using a Windows Server 2025 Internet Information Server with IIS running a Waitress Flask Server
