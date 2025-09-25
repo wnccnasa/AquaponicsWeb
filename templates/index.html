@@ -1,0 +1,37 @@
+{% extends "base.html"%}
+{% block content %}
+<div class="container">
+
+  <!-- Restored original intro text (kept existing content) -->
+  <div class="mb-4">
+    <h1 class="mb-2">🚀 WNCC STEM Club - Aquaponics System</h1>
+    <p>The WNCC STEM Club meets every Thursday at 4 PM in Room C1.</p>
+  </div>
+
+  <!-- Fish Tank Video -->
+  <div class="card mb-4">
+    <div class="card-header">🐟 Fish Tank (The fish are taking a temporary technical sabbatical. They will be back live
+      in a few days.)</div>
+    <div class="card-body">
+      <video width="100%" controls autoplay loop muted>
+        <source src="{{ url_for('static', filename='FishCam.mp4') }}" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+  </div>
+
+
+  <!-- Restored System Monitoring card -->
+  <div class="card mb-4">
+    <div class="card-header">📊 System Monitoring</div>
+    <div class="card-body text-center">
+      <p>Monitor real-time sensor data for water quality, temperature, and environmental conditions.</p>
+      <a href="{{ url_for('sensors') }}" class="btn btn-primary btn-lg">View Sensor Dashboard</a>
+    </div>
+  </div>
+
+
+
+</div>
+
+{% endblock %}

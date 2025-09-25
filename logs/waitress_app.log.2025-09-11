@@ -1,0 +1,126 @@
+2025-09-11 00:52:07,595 INFO === Waitress app logging reconfigured with rotation ===
+2025-09-11 00:52:07,597 INFO Script directory: C:\inetpub\aquaponics
+2025-09-11 00:52:07,597 INFO Current working directory: C:\inetpub\aquaponics
+2025-09-11 00:52:07,597 INFO Log base file (current): C:\inetpub\aquaponics\logs\waitress_app.log
+2025-09-11 00:52:07,597 INFO Flask app imported successfully
+2025-09-11 00:52:07,597 INFO Running as main script
+2025-09-11 00:52:07,597 INFO Starting Waitress server on 127.0.0.1:17618
+2025-09-11 01:42:35,543 INFO === Waitress app logging reconfigured with rotation ===
+2025-09-11 01:42:35,543 INFO Script directory: C:\inetpub\aquaponics
+2025-09-11 01:42:35,543 INFO Current working directory: C:\inetpub\aquaponics
+2025-09-11 01:42:35,543 INFO Log base file (current): C:\inetpub\aquaponics\logs\waitress_app.log
+2025-09-11 01:42:35,543 INFO Flask app imported successfully
+2025-09-11 01:42:35,544 INFO Running as main script
+2025-09-11 01:42:35,544 INFO Starting Waitress server on 127.0.0.1:27506
+2025-09-11 02:25:14,865 INFO === Waitress app logging reconfigured with rotation ===
+2025-09-11 02:25:14,865 INFO Script directory: C:\inetpub\aquaponics
+2025-09-11 02:25:14,865 INFO Current working directory: C:\inetpub\aquaponics
+2025-09-11 02:25:14,865 INFO Log base file (current): C:\inetpub\aquaponics\logs\waitress_app.log
+2025-09-11 02:25:14,865 INFO Flask app imported successfully
+2025-09-11 02:25:14,865 INFO Running as main script
+2025-09-11 02:25:14,865 INFO Starting Waitress server on 127.0.0.1:3095
+2025-09-11 05:15:35,205 INFO === Waitress app logging reconfigured with rotation ===
+2025-09-11 05:15:35,210 INFO Script directory: C:\inetpub\aquaponics
+2025-09-11 05:15:35,210 INFO Current working directory: C:\inetpub\aquaponics
+2025-09-11 05:15:35,211 INFO Log base file (current): C:\inetpub\aquaponics\logs\waitress_app.log
+2025-09-11 05:15:35,211 INFO Flask app imported successfully
+2025-09-11 05:15:35,211 INFO Running as main script
+2025-09-11 05:15:35,211 INFO Starting Waitress server on 127.0.0.1:3698
+2025-09-11 05:52:57,539 INFO === Waitress app logging reconfigured with rotation ===
+2025-09-11 05:52:57,539 INFO Script directory: C:\inetpub\aquaponics
+2025-09-11 05:52:57,540 INFO Current working directory: C:\inetpub\aquaponics
+2025-09-11 05:52:57,540 INFO Log base file (current): C:\inetpub\aquaponics\logs\waitress_app.log
+2025-09-11 05:52:57,540 INFO Flask app imported successfully
+2025-09-11 05:52:57,540 INFO Running as main script
+2025-09-11 05:52:57,540 INFO Starting Waitress server on 127.0.0.1:11026
+2025-09-11 06:33:21,688 INFO === Waitress app logging reconfigured with rotation ===
+2025-09-11 06:33:21,689 INFO Script directory: C:\inetpub\aquaponics
+2025-09-11 06:33:21,689 INFO Current working directory: C:\inetpub\aquaponics
+2025-09-11 06:33:21,689 INFO Log base file (current): C:\inetpub\aquaponics\logs\waitress_app.log
+2025-09-11 06:33:21,689 INFO Flask app imported successfully
+2025-09-11 06:33:21,689 INFO Running as main script
+2025-09-11 06:33:21,689 INFO Starting Waitress server on 127.0.0.1:18941
+2025-09-11 07:54:27,178 INFO === Waitress app logging reconfigured with rotation ===
+2025-09-11 07:54:27,178 INFO Script directory: C:\inetpub\aquaponics
+2025-09-11 07:54:27,178 INFO Current working directory: C:\inetpub\aquaponics
+2025-09-11 07:54:27,178 INFO Log base file (current): C:\inetpub\aquaponics\logs\waitress_app.log
+2025-09-11 07:54:27,178 INFO Flask app imported successfully
+2025-09-11 07:54:27,178 INFO Running as main script
+2025-09-11 07:54:27,178 INFO Starting Waitress server on 127.0.0.1:2060
+2025-09-11 09:03:01,535 INFO === Waitress app logging reconfigured with rotation ===
+2025-09-11 09:03:01,535 INFO Script directory: C:\inetpub\aquaponics
+2025-09-11 09:03:01,535 INFO Current working directory: C:\inetpub\aquaponics
+2025-09-11 09:03:01,535 INFO Log base file (current): C:\inetpub\aquaponics\logs\waitress_app.log
+2025-09-11 09:03:01,535 INFO Flask app imported successfully
+2025-09-11 09:03:01,536 INFO Running as main script
+2025-09-11 09:03:01,536 INFO Starting Waitress server on 127.0.0.1:15498
+2025-09-11 09:50:56,741 INFO === Waitress app logging reconfigured with rotation ===
+2025-09-11 09:50:56,742 INFO Script directory: C:\inetpub\aquaponics
+2025-09-11 09:50:56,742 INFO Current working directory: C:\inetpub\aquaponics
+2025-09-11 09:50:56,742 INFO Log base file (current): C:\inetpub\aquaponics\logs\waitress_app.log
+2025-09-11 09:50:56,742 INFO Flask app imported successfully
+2025-09-11 09:50:56,742 INFO Running as main script
+2025-09-11 09:50:56,742 INFO Starting Waitress server on 127.0.0.1:24887
+2025-09-11 11:23:44,782 INFO === Waitress app logging reconfigured with rotation ===
+2025-09-11 11:23:44,782 INFO Script directory: C:\inetpub\aquaponics
+2025-09-11 11:23:44,782 INFO Current working directory: C:\inetpub\aquaponics
+2025-09-11 11:23:44,782 INFO Log base file (current): C:\inetpub\aquaponics\logs\waitress_app.log
+2025-09-11 11:23:44,782 INFO Flask app imported successfully
+2025-09-11 11:23:44,782 INFO Running as main script
+2025-09-11 11:23:44,782 INFO Starting Waitress server on 127.0.0.1:10298
+2025-09-11 14:35:43,842 INFO === Waitress app logging reconfigured with rotation ===
+2025-09-11 14:35:43,842 INFO Script directory: C:\inetpub\aquaponics
+2025-09-11 14:35:43,842 INFO Current working directory: C:\inetpub\aquaponics
+2025-09-11 14:35:43,842 INFO Log base file (current): C:\inetpub\aquaponics\logs\waitress_app.log
+2025-09-11 14:35:43,842 INFO Flask app imported successfully
+2025-09-11 14:35:43,842 INFO Running as main script
+2025-09-11 14:35:43,842 INFO Starting Waitress server on 127.0.0.1:15150
+2025-09-11 16:03:08,343 INFO === Waitress app logging reconfigured with rotation ===
+2025-09-11 16:03:08,343 INFO Script directory: C:\inetpub\aquaponics
+2025-09-11 16:03:08,343 INFO Current working directory: C:\inetpub\aquaponics
+2025-09-11 16:03:08,344 INFO Log base file (current): C:\inetpub\aquaponics\logs\waitress_app.log
+2025-09-11 16:03:08,344 INFO Flask app imported successfully
+2025-09-11 16:03:08,344 INFO Running as main script
+2025-09-11 16:03:08,344 INFO Starting Waitress server on 127.0.0.1:32274
+2025-09-11 16:54:23,311 INFO === Waitress app logging reconfigured with rotation ===
+2025-09-11 16:54:23,311 INFO Script directory: C:\inetpub\aquaponics
+2025-09-11 16:54:23,311 INFO Current working directory: C:\inetpub\aquaponics
+2025-09-11 16:54:23,312 INFO Log base file (current): C:\inetpub\aquaponics\logs\waitress_app.log
+2025-09-11 16:54:23,312 INFO Flask app imported successfully
+2025-09-11 16:54:23,312 INFO Running as main script
+2025-09-11 16:54:23,312 INFO Starting Waitress server on 127.0.0.1:9548
+2025-09-11 18:19:39,868 INFO === Waitress app logging reconfigured with rotation ===
+2025-09-11 18:19:39,868 INFO Script directory: C:\inetpub\aquaponics
+2025-09-11 18:19:39,868 INFO Current working directory: C:\inetpub\aquaponics
+2025-09-11 18:19:39,868 INFO Log base file (current): C:\inetpub\aquaponics\logs\waitress_app.log
+2025-09-11 18:19:39,868 INFO Flask app imported successfully
+2025-09-11 18:19:39,868 INFO Running as main script
+2025-09-11 18:19:39,868 INFO Starting Waitress server on 127.0.0.1:26258
+2025-09-11 18:45:25,044 INFO === Waitress app logging reconfigured with rotation ===
+2025-09-11 18:45:25,044 INFO Script directory: C:\inetpub\aquaponics
+2025-09-11 18:45:25,044 INFO Current working directory: C:\inetpub\aquaponics
+2025-09-11 18:45:25,044 INFO Log base file (current): C:\inetpub\aquaponics\logs\waitress_app.log
+2025-09-11 18:45:25,045 INFO Flask app imported successfully
+2025-09-11 18:45:25,045 INFO Running as main script
+2025-09-11 18:45:25,045 INFO Starting Waitress server on 127.0.0.1:31303
+2025-09-11 19:15:33,027 INFO === Waitress app logging reconfigured with rotation ===
+2025-09-11 19:15:33,027 INFO Script directory: C:\inetpub\aquaponics
+2025-09-11 19:15:33,027 INFO Current working directory: C:\inetpub\aquaponics
+2025-09-11 19:15:33,027 INFO Log base file (current): C:\inetpub\aquaponics\logs\waitress_app.log
+2025-09-11 19:15:33,027 INFO Flask app imported successfully
+2025-09-11 19:15:33,027 INFO Running as main script
+2025-09-11 19:15:33,028 INFO Starting Waitress server on 127.0.0.1:4440
+2025-09-11 19:44:32,971 INFO === Waitress app logging reconfigured with rotation ===
+2025-09-11 19:44:32,972 INFO Script directory: C:\inetpub\aquaponics
+2025-09-11 19:44:32,972 INFO Current working directory: C:\inetpub\aquaponics
+2025-09-11 19:44:32,972 INFO Log base file (current): C:\inetpub\aquaponics\logs\waitress_app.log
+2025-09-11 19:44:32,972 INFO Flask app imported successfully
+2025-09-11 19:44:32,972 INFO Running as main script
+2025-09-11 19:44:32,972 INFO Starting Waitress server on 127.0.0.1:10122
+2025-09-11 21:40:17,103 INFO === Waitress app logging reconfigured with rotation ===
+2025-09-11 21:40:17,103 INFO Script directory: C:\inetpub\aquaponics
+2025-09-11 21:40:17,103 INFO Current working directory: C:\inetpub\aquaponics
+2025-09-11 21:40:17,103 INFO Log base file (current): C:\inetpub\aquaponics\logs\waitress_app.log
+2025-09-11 21:40:17,103 INFO Flask app imported successfully
+2025-09-11 21:40:17,103 INFO Running as main script
+2025-09-11 21:40:17,103 INFO Starting Waitress server on 127.0.0.1:32795
