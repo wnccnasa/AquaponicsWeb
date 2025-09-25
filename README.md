@@ -1,4 +1,4 @@
-# Aquaponics
+# Aquaponics Web Application
 
 ## Sensors Purchased
 
