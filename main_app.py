@@ -22,7 +22,7 @@ import time
 from typing import Dict
 
 # Local modules that handle pulling frames from upstream cameras
-from broadcast_relay import BroadcastCamera
+from cached_relay import CachedMediaRelay
 
 from fish_cam_config import (
     DEFAULT_STREAM_HOST,
@@ -34,21 +34,17 @@ from fish_cam_config import (
 # ---------------------------------------------------------------------------
 # LOGGING SETUP
 # ---------------------------------------------------------------------------
-# We log to files so we can review what happened later (errors, starts, etc.)
 LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
 os.makedirs(LOG_DIR, exist_ok=True)
 
-# Base filename (Flask will create one per day using rotation)
 LOG_FILE = os.path.join(LOG_DIR, "main_app")
 
-# TimedRotatingFileHandler creates a new log file at midnight and keeps 7 days
 handler = logging.handlers.TimedRotatingFileHandler(
     LOG_FILE, when="midnight", interval=1, backupCount=7, encoding="utf-8"
 )
 handler.suffix = "%Y-%m-%d.log"
 handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
 
-# Root logger (shared across modules)
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 logger.addHandler(handler)
@@ -57,43 +53,36 @@ logging.info("Application start")
 # ---------------------------------------------------------------------------
 # FLASK APP SETUP
 # ---------------------------------------------------------------------------
-# static_url_path lets static files be served under /aquaponics/static
 app = Flask(__name__, static_url_path="/aquaponics/static")
-
-# APPLICATION_ROOT allows IIS or reverse proxy to mount at /aquaponics
 app.config["APPLICATION_ROOT"] = os.environ.get("APPL_VIRTUAL_PATH", "/")
 
 
 # ---------------------------------------------------------------------------
 # RELAY / STREAMING TUNING
 # ---------------------------------------------------------------------------
-# The relay creates ONE upstream connection per unique camera URL and shares
-# frames with all connected viewers. This saves bandwidth and CPU.
-WIRELESS_CACHE_DURATION = (
-    15.0  # Seconds of frames to retain (smoothing hiccups)
-)
-WIRELESS_SERVE_DELAY = 2.0  # Delay used by CachedMediaRelay to stabilize order
-WARMUP_TIMEOUT = 15  # Seconds to wait for first frame before giving up
-MAX_CONSECUTIVE_TIMEOUTS = (
-    10  # If client sees this many empty waits, disconnect
-)
-QUEUE_TIMEOUT = 15  # Seconds each client waits for a frame before retry
+WIRELESS_CACHE_DURATION = 15.0  # Seconds of frames to retain (smoothing hiccups)
+WIRELESS_SERVE_DELAY = 2.0      # Delay used by CachedMediaRelay to stabilize order
+WARMUP_TIMEOUT = 15             # Seconds to wait for first frame before giving up
+MAX_CONSECUTIVE_TIMEOUTS = 10   # If client sees this many empty waits, disconnect
+QUEUE_TIMEOUT = 15              # Seconds each client waits for a frame before retry
 
 # Dictionary that holds active relay objects keyed by the full upstream URL
-_broadcast_cameras: Dict[str, BroadcastCamera] = {}
-_broadcast_lock = threading.Lock()
+_media_relays: Dict[str, CachedMediaRelay] = {}
+_media_lock = threading.Lock()
 
-
-def get_broadcast_camera(stream_url: str) -> BroadcastCamera:
-    with _broadcast_lock:
-        cam = _broadcast_cameras.get(stream_url)
-        if cam is None:
-            cam = BroadcastCamera(stream_url)
-            cam.start()
-            _broadcast_cameras[stream_url] = cam
-            logging.info(f"[BroadcastFactory] Created {stream_url}")
-        return cam
-
+def get_media_relay(stream_url: str) -> CachedMediaRelay:
+    with _media_lock:
+        relay = _media_relays.get(stream_url)
+        if relay is None:
+            relay = CachedMediaRelay(
+                stream_url,
+                cache_duration=WIRELESS_CACHE_DURATION,
+                serve_delay=WIRELESS_SERVE_DELAY,
+            )
+            relay.start()
+            _media_relays[stream_url] = relay
+            logging.info(f"[CachedRelayFactory] Created {stream_url}")
+        return relay
 
 # ---------------------------------------------------------------------------
 # ROUTES: WEB PAGES
@@ -127,7 +116,6 @@ def index():
     )
 
 
-# Champions page route
 @app.route("/aquaponics/champions")
 def champions():
     """Page recognizing Aquaponics Champions."""
@@ -187,50 +175,29 @@ def stream_proxy():
     # Build complete upstream URL
     stream_url = f"http://{host}:{port}{path}"
 
-    cam = get_broadcast_camera(stream_url)
-    cam.add_client()
+    relay = get_media_relay(stream_url)
+    client_queue = relay.add_client()
 
     def generate():
-        WARMUP_TIMEOUT = 10
-        QUEUE_TIMEOUT = 8
-        MAX_TIMEOUTS = 5
         waited = 0.0
         # Wait for first frame
-        while cam.last_jpeg is None and waited < WARMUP_TIMEOUT and cam.running:
-            with cam._cond:
-                cam._cond.wait(timeout=0.2)
+        while relay.last_frame is None and waited < WARMUP_TIMEOUT and relay.running:
+            time.sleep(0.2)
             waited += 0.2
-        if cam.last_jpeg is None:
+        if relay.last_frame is None:
             return
-        last_sent = -1
-        timeouts = 0
-        while cam.running:
-            with cam._cond:
-                signaled = cam._cond.wait_for(
-                    lambda: not cam.running or cam.frame_id != last_sent,
-                    timeout=QUEUE_TIMEOUT,
-                )
-                if not signaled:
-                    timeouts += 1
-                    if timeouts >= MAX_TIMEOUTS or not cam.running:
-                        break
-                    continue
-                timeouts = 0
-                if not cam.running or cam.last_jpeg is None:
-                    continue
-                jpeg = cam.last_jpeg
-                last_sent = cam.frame_id
-            yield (
-                b"--frame\r\n"
-                b"Content-Type: image/jpeg\r\n"
-                b"Content-Length: "
-                + str(len(jpeg)).encode()
-                + b"\r\n\r\n"
-                + jpeg
-                + b"\r\n"
-            )
-            # Optional tiny heartbeat every N frames (no-op comment line)
-            # if last_sent % 120 == 0: yield b"#\r\n"
+        consecutive_timeouts = 0
+        while relay.running:
+            try:
+                chunk = client_queue.get(timeout=QUEUE_TIMEOUT)
+                consecutive_timeouts = 0
+                if chunk is None:
+                    break
+                yield chunk
+            except Exception:
+                consecutive_timeouts += 1
+                if consecutive_timeouts >= MAX_CONSECUTIVE_TIMEOUTS or not relay.running:
+                    break
 
     resp = Response(
         generate(),
@@ -243,7 +210,7 @@ def stream_proxy():
     )
 
     def _close(response):
-        cam.remove_client()
+        relay.remove_client(client_queue)
         return response
 
     return resp
@@ -265,8 +232,8 @@ def server_info():
     return {
         "server": request.environ.get("SERVER_SOFTWARE", "unknown"),
         "active_threads": len(threading.enumerate()),
-        "broadcast_cameras": list(
-            getattr(globals(), "_broadcast_cameras", {}).keys()
+        "media_relays": list(
+            getattr(globals(), "_media_relays", {}).keys()
         ),
     }
 
@@ -282,15 +249,14 @@ def waitress_info():
     all_threads = threading.enumerate()
     thread_names = [t.name for t in all_threads]
     waitress_threads = [n for n in thread_names if "waitress" in n.lower()]
-    camera_stats = {}
-    with _broadcast_lock:
-        for url, cam in _broadcast_cameras.items():
-            with cam._cond:
-                camera_stats[url] = {
-                    "clients": cam._clients,
-                    "frame_id": cam.frame_id,
-                    "has_frame": cam.last_jpeg is not None,
-                    "running": cam.running,
+    relay_stats = {}
+    with _media_lock:
+        for url, relay in _media_relays.items():
+            with relay.lock:
+                relay_stats[url] = {
+                    "clients": len(relay.clients),
+                    "has_frame": relay.last_frame is not None,
+                    "running": relay.running,
                 }
 
     return {
@@ -302,7 +268,7 @@ def waitress_info():
         "threads_waitress": len(waitress_threads),
         "waitress_thread_names_sample": waitress_threads[:10],
         "threads_other": len(all_threads) - len(waitress_threads),
-        "cameras": camera_stats,
+        "relays": relay_stats,
     }
 
 
@@ -325,11 +291,11 @@ def cleanup_relays():
     Called at shutdown to stop all relay threads cleanly.
     Prevents orphan background threads after server exit.
     """
-    with _broadcast_lock:
-        for c in _broadcast_cameras.values():
-            c.stop()
-        _broadcast_cameras.clear()
-    logging.info("Broadcast relays cleaned up")
+    with _media_lock:
+        for relay in _media_relays.values():
+            relay.stop()
+        _media_relays.clear()
+    logging.info("Cached relays cleaned up")
 
 
 # ---------------------------------------------------------------------------
