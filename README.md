@@ -29,7 +29,7 @@
 - **Sump** for circulation of water, pH sensors, health of water without disturbing the fishies
 - **Quiet oscillating fan** for plants
 
-### Electrical Conductivity Sensor Options
+### Electrical Conductivity Sensor Options Research
 
 - [MICS6814 Gas Sensor (GitHub)](https://github.com/pimoroni/mics6814-python)
 - [Adafruit ENS160 MOX Gas Sensor](https://learn.adafruit.com/adafruit-ens160-mox-gas-sensor)
