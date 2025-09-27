@@ -1252,3 +1252,17 @@
 2025-09-27 11:33:27,826 INFO Retrying in 1.0 seconds...
 2025-09-27 11:33:28,826 INFO Connecting to upstream camera: http://10.0.0.2:8000/stream0.mjpg
 2025-09-27 11:33:28,827 INFO Connecting to upstream camera: http://10.0.0.2:8000/stream1.mjpg
+2025-09-27 11:33:33,053 INFO Client removed. Total clients: 0
+2025-09-27 11:33:33,053 INFO Client removed. Total clients: 0
+2025-09-27 11:33:38,830 ERROR Upstream connection error: HTTPConnectionPool(host='10.0.0.2', port=8000): Max retries exceeded with url: /stream0.mjpg (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001D0540B0B90>, 'Connection to 10.0.0.2 timed out. (connect timeout=10)'))
+2025-09-27 11:33:38,830 ERROR Upstream connection error: HTTPConnectionPool(host='10.0.0.2', port=8000): Max retries exceeded with url: /stream1.mjpg (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001D053F53A80>, 'Connection to 10.0.0.2 timed out. (connect timeout=10)'))
+2025-09-27 11:33:38,830 INFO Retrying in 1.5 seconds...
+2025-09-27 11:33:38,830 INFO Retrying in 1.5 seconds...
+2025-09-27 11:33:40,331 INFO Connecting to upstream camera: http://10.0.0.2:8000/stream0.mjpg
+2025-09-27 11:33:40,331 INFO Connecting to upstream camera: http://10.0.0.2:8000/stream1.mjpg
+2025-09-27 11:33:50,334 ERROR Upstream connection error: HTTPConnectionPool(host='10.0.0.2', port=8000): Max retries exceeded with url: /stream0.mjpg (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001D0540E42B0>, 'Connection to 10.0.0.2 timed out. (connect timeout=10)'))
+2025-09-27 11:33:50,334 ERROR Upstream connection error: HTTPConnectionPool(host='10.0.0.2', port=8000): Max retries exceeded with url: /stream1.mjpg (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001D0540DC710>, 'Connection to 10.0.0.2 timed out. (connect timeout=10)'))
+2025-09-27 11:33:50,334 INFO Retrying in 2.25 seconds...
+2025-09-27 11:33:50,334 INFO Retrying in 2.25 seconds...
+2025-09-27 11:33:52,585 INFO Connecting to upstream camera: http://10.0.0.2:8000/stream1.mjpg
+2025-09-27 11:33:52,585 INFO Connecting to upstream camera: http://10.0.0.2:8000/stream0.mjpg
