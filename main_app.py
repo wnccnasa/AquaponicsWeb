@@ -28,21 +28,28 @@ from cached_relay import CachedMediaRelay
 # LOGGING SETUP
 # ---------------------------------------------------------------------------
 # We log to files so we can review what happened later (errors, starts, etc.)
+# LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
+# os.makedirs(LOG_DIR, exist_ok=True)
+#
+# LOG_FILE = os.path.join(LOG_DIR, "main_app")
+#
+# handler = logging.handlers.TimedRotatingFileHandler(
+#     LOG_FILE, when="midnight", interval=1, backupCount=7, encoding="utf-8"
+# )
+# handler.suffix = "%Y-%m-%d.log"
+# handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+
+# Change logging file name to use explicit "main_app.log" base and cleaner rotated suffix
 LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
 os.makedirs(LOG_DIR, exist_ok=True)
 
-# Base filename (Flask will create one per day using rotation)
-LOG_FILE = os.path.join(LOG_DIR, "main_app")
+LOG_FILE = os.path.join(LOG_DIR, "main_app.log")
 
-# TimedRotatingFileHandler creates a new log file at midnight and keeps 7 days
 handler = logging.handlers.TimedRotatingFileHandler(
-    LOG_FILE,
-    when="midnight",
-    interval=1,
-    backupCount=7,
-    encoding="utf-8"
+    LOG_FILE, when="midnight", interval=1, backupCount=7, encoding="utf-8"
 )
-handler.suffix = "%Y-%m-%d.log"
+# rotated files will be: main_app.log.2025-09-27 (no duplicate .log)
+handler.suffix = "%Y-%m-%d"
 handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
 
 # Root logger (shared across modules)
