@@ -40,13 +40,4 @@
       </httpProtocol>
     </system.webServer>
   </location>
-
-  <httpPlatform processPath="C:\inetpub\aquaponics\.venv\Scripts\python.exe"
-                arguments="waitress_app.py"
-                startupTimeLimit="60"
-                requestTimeout="00:04:00">
-    <environmentVariables>
-      <environmentVariable name="PYTHONPATH" value="C:\inetpub\aquaponics" />
-    </environmentVariables>
-  </httpPlatform>
 </configuration>
