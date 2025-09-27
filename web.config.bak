@@ -22,13 +22,6 @@
         <add name="Cache-Control" value="no-cache" />
       </customHeaders>
     </httpProtocol>
-
-    <httpPlatform
-      processPath="C:\inetpub\aquaponics\.venv\Scripts\python.exe"
-      arguments="waitress_app.py"
-      stdoutLogEnabled="true"
-      stdoutLogFile="C:\inetpub\logs\aquaponics\stdout.log"
-      startupTimeLimit="30" />
   </system.webServer>
 
   <!-- Location element must be directly under <configuration> -->
@@ -47,13 +40,4 @@
       </httpProtocol>
     </system.webServer>
   </location>
-
-  <httpPlatform processPath="C:\inetpub\aquaponics\.venv\Scripts\python.exe"
-                arguments="waitress_app.py"
-                startupTimeLimit="60"
-                requestTimeout="00:04:00">
-    <environmentVariables>
-      <environmentVariable name="PYTHONPATH" value="C:\inetpub\aquaponics" />
-    </environmentVariables>
-  </httpPlatform>
 </configuration>
