@@ -2,77 +2,39 @@
 
 ## Setup Instructions for Windows Server 2025 and Waitress
 
-1. Create a folder under c:\intepub
-2. Install the latest version of Python
-
-## Creating and Using a Virtual Environment
-
-**Option 1: Using `venv` (Recommended)**
-
-1. **Create a virtual environment:**
+1. Clone the repository:
 
    ```bash
-   # Windows Command Prompt/PowerShell in the base directory
+   # Windows Command Prompt/PowerShell in the c:\inetpub folder
+   https://github.com/wnccnasa/AquaponicsWeb.git
+   ```
+
+2. Install the latest version of Python
+3. Install IIS HTTPHandler
+4. Create a virtual environment:
+
+   ```bash
+   # Windows Command Prompt/PowerShell in the base directory (AquaponicsWeb)
    python -m venv .venv
    ```
 
-2. **Activate the virtual environment:**
+5. Activate the virtual environment:
 
    ```bash
-   # Windows Command Prompt
    .venv\Scripts\activate
    ```
 
-3. **Install required packages:**
+6. Install required packages:
 
    ```bash
    pip install flask waitress requests
    ```
 
-4. **Deactivate the virtual environment when done:**
+7. Restart the IIS server
 
    ```bash
-   deactivate
+   iisreset
    ```
-
-
-#### Running the Application
-
-1. **Activate your virtual environment** (see steps above)
-2. **Navigate to the project directory:**
-
-   ```bash
-   cd path/to/AquaponicsWeb
-   ```
-
-3. **Run the Flask development server:**
-
-   ```bash
-   python main_app.py
-   ```
-
-   Or **run with Waitress for production:**
-
-   ```bash
-   python waitress_app.py
-   ```
-
-### Setup Waitress with Windows Server IIS
-
-1. **Setup folder under inetpub for flask application**
-2. **Create a Python virtual environment in the application folder:**
-
-   ```powershell
-   cd C:\inetpub\wwwroot\aquaponics
-   python -m venv venv
-   venv\Scripts\activate
-   pip install flask waitress requests opencv-python-headless
-   ```
-
-3. **Configure IIS to use the virtual environment Python interpreter**
-4. **Set up appropriate permissions for the IIS application pool**
-
----
 
 ## Sensors Purchased
 
