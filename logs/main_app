@@ -1234,3 +1234,21 @@
 2025-09-27 11:17:02,922 INFO Retrying in 30.0 seconds...
 2025-09-27 11:17:02,923 ERROR Upstream connection error: HTTPConnectionPool(host='10.0.0.2', port=8000): Max retries exceeded with url: /stream1.mjpg (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000002A2821E7CE0>, 'Connection to 10.0.0.2 timed out. (connect timeout=10)'))
 2025-09-27 11:17:02,923 INFO Retrying in 30.0 seconds...
+2025-09-27 11:33:17,442 INFO Application start
+2025-09-27 11:33:17,593 INFO Serving on http://127.0.0.1:4522
+2025-09-27 11:33:17,819 INFO Connecting to upstream camera: http://10.0.0.2:8000/stream0.mjpg
+2025-09-27 11:33:17,819 INFO Frame cache started for http://10.0.0.2:8000/stream0.mjpg (delay=2.0s)
+2025-09-27 11:33:17,820 INFO Cached media relay started for http://10.0.0.2:8000/stream0.mjpg
+2025-09-27 11:33:17,820 INFO [CachedRelayFactory] Created http://10.0.0.2:8000/stream0.mjpg
+2025-09-27 11:33:17,820 INFO Client added. Total clients: 1 for http://10.0.0.2:8000/stream0.mjpg
+2025-09-27 11:33:17,821 INFO Connecting to upstream camera: http://10.0.0.2:8000/stream1.mjpg
+2025-09-27 11:33:17,821 INFO Frame cache started for http://10.0.0.2:8000/stream1.mjpg (delay=2.0s)
+2025-09-27 11:33:17,822 INFO Cached media relay started for http://10.0.0.2:8000/stream1.mjpg
+2025-09-27 11:33:17,822 INFO [CachedRelayFactory] Created http://10.0.0.2:8000/stream1.mjpg
+2025-09-27 11:33:17,822 INFO Client added. Total clients: 1 for http://10.0.0.2:8000/stream1.mjpg
+2025-09-27 11:33:27,825 ERROR Upstream connection error: HTTPConnectionPool(host='10.0.0.2', port=8000): Max retries exceeded with url: /stream1.mjpg (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001D0540B0910>, 'Connection to 10.0.0.2 timed out. (connect timeout=10)'))
+2025-09-27 11:33:27,826 ERROR Upstream connection error: HTTPConnectionPool(host='10.0.0.2', port=8000): Max retries exceeded with url: /stream0.mjpg (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x000001D053F42E40>, 'Connection to 10.0.0.2 timed out. (connect timeout=10)'))
+2025-09-27 11:33:27,826 INFO Retrying in 1.0 seconds...
+2025-09-27 11:33:27,826 INFO Retrying in 1.0 seconds...
+2025-09-27 11:33:28,826 INFO Connecting to upstream camera: http://10.0.0.2:8000/stream0.mjpg
+2025-09-27 11:33:28,827 INFO Connecting to upstream camera: http://10.0.0.2:8000/stream1.mjpg
