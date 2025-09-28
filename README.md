@@ -12,10 +12,10 @@
 2. Install the latest version of Python
 3. Install IIS HTTPHandler
 4. Create a virtual environment:
+   1. Open a Windows Command Prompt/PowerShell in the base directory (AquaponicsWeb)
 
    ```bash
-   # Windows Command Prompt/PowerShell in the base directory (AquaponicsWeb)
-   python -m venv .venv
+      python -m venv .venv
    ```
 
 5. Activate the virtual environment:
