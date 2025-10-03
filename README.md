@@ -2,12 +2,11 @@
 
 ## Setup Instructions for Windows Server 2025 and Waitress
 
-1. Create a folder under c:\intepub
+1. Install IIS HTTPHandler (IIS uses this to start the waitress application)
 2. Install the latest version of Python
+3. Create a folder under c:\intepub
 
 ## Creating and Using a Virtual Environment
-
-**Option 1: Using `venv` (Recommended)**
 
 1. Create a virtual environment:
 2. Windows Command Prompt/PowerShell in the base directory
@@ -16,16 +15,7 @@
    python -m venv .venv
    ```
 
-2. Install the latest version of Python
-3. Install IIS HTTPHandler
-4. Create a virtual environment:
-   1. Open a Windows Command Prompt/PowerShell in the base directory (AquaponicsWeb)
-
-   ```bash
-      python -m venv .venv
-   ```
-
-5. Activate the virtual environment:
+3. Activate the virtual environment:
 
    ```bash
    .venv\Scripts\activate
@@ -45,18 +35,8 @@
 
 ### Setup Waitress with Windows Server IIS
 
-1. **Setup folder under inetpub for flask application**
-2. **Create a Python virtual environment in the application folder:**
-
-   ```powershell
-   cd C:\inetpub\wwwroot\aquaponics
-   python -m venv .venv
-   .venv\Scripts\activate
-   pip install flask waitress requests
-   ```
-
-3. **Configure IIS to use the virtual environment Python interpreter**
-4. **Set up appropriate permissions for the IIS application pool**
+1. Setup folder under inetpub for flask application
+3. Configure IIS to use the virtual environment Python interpreter with web.config
 
 ---
 
@@ -104,8 +84,6 @@
 ## Code Summary
 
 - **main_app.py**: The main Flask web application. It provides a web interface for viewing MJPEG video streams from remote cameras, handles configuration, logging, and routes for the web UI. It uses `MediaRelay` and `CachedMediaRelay` to efficiently distribute video streams to multiple clients.
-
-- **media_relay.py**: Implements the `MediaRelay` class, which acts as a smart video distributor. It connects to a camera stream once and relays the video to multiple web browsers, handling reconnections and removing slow clients.
 
 - **frame_cache.py**: Contains the `FrameCache` system, which buffers video frames from unreliable wireless cameras. It stores frames temporarily and serves them with a delay to smooth out connection issues, providing stable video playback.
 
