@@ -16,22 +16,31 @@
    python -m venv .venv
    ```
 
-2. **Activate the virtual environment:**
+2. Install the latest version of Python
+3. Install IIS HTTPHandler
+4. Create a virtual environment:
+   1. Open a Windows Command Prompt/PowerShell in the base directory (AquaponicsWeb)
+
+   ```bash
+      python -m venv .venv
+   ```
+
+5. Activate the virtual environment:
 
    ```bash
    .venv\Scripts\activate
    ```
 
-3. **Install required packages:**
+6. Install required packages:
 
    ```bash
    pip install flask waitress requests
    ```
 
-4. **Deactivate the virtual environment when done:**
+7. Restart the IIS server
 
    ```bash
-   deactivate
+   iisreset
    ```
 
 ### Setup Waitress with Windows Server IIS
