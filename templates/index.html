@@ -2,7 +2,7 @@
 {% block content %}
 <div class="container">
 
-  <!-- Restored original intro text (kept existing content) -->
+  
   <div class="mb-4">
     <h1 class="mb-2">🚀 WNCC STEM Club - Aquaponics System</h1>
     <p>The WNCC STEM Club meets every Thursday at 4 PM in Room C1.</p>
@@ -20,6 +20,24 @@
     </div>
   </div>
 
+ <!-- Fish Names -->
+  <div class="card mb-4">
+    <div class="card-header">🐠 Fish Tank Inhabitants</div>
+    <div class="card-body">
+      <ul class="list-unstyled mb-0">
+        <li><strong>Curiosity</strong> — Orange & white comet goldfish. Donor: Sarah Bartlett.</li>
+        <li><strong>Jackson Pollock</strong> — Black & orange calico goldfish (named for his ever-changing patches).</li>
+        <li><strong>Todd</strong> — Our oldest, largest goldfish; he speaks for himself.</li>
+        <li><strong>Bump Rogers</strong> — Goldfish with fatty lumps (has had them long-term).</li>
+        <li><strong>Frodo</strong> &amp; <strong>Sam</strong> — Our classic goldfish twins.</li>
+        <li><strong>Chief Inspector Pleco</strong> — Black & white inspector pleco. (Thanks Bill)</li>
+        <li><strong>Pablo Plec-caso</strong> — Albino bristlenose pleco.</li>
+        <li><strong>Banksy</strong> — New baby fantail goldfish (still discovering his personality).</li>
+        <li><strong>Lightning McQueen</strong> &amp; <strong>Mater</strong> — Our identical mystery snails.</li>
+      </ul>
+    </div>
+  </div>
+
   <!-- Plants Bed -->
   <div class="card mb-4">
     <div class="card-header">🌱 Plant Bed</div>
@@ -32,7 +50,7 @@
     </div>
   </div>
 
-  <!-- Restored System Monitoring card -->
+  <!-- System Monitoring -->
   <div class="card mb-4">
     <div class="card-header">📊 System Monitoring</div>
     <div class="card-body text-center">
@@ -40,6 +58,8 @@
       <a href="{{ url_for('sensors') }}" class="btn btn-primary btn-lg">View Sensor Dashboard</a>
     </div>
   </div>
+
+
 
 </div>
 
