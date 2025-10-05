@@ -4,17 +4,22 @@
 
 /* Main body styling - sets the overall look of the page */
 body {
-    font-family: Arial, sans-serif;          /* Easy to read font */
+    /* Easy to read font */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif;         
     margin: 0;                               /* Remove default browser margins */
     padding: 20px;                           /* Add space around content */
     background-color: rgb(0, 58, 112);      /* WNCC blue background */
     color: #ffffff;                          /* White text for contrast */
 }
 
+p{
+    line-height: 150%;
+}
+
 /* General link styling throughout the site */
 a {
-    color: white;                            /* White links by default */
-    text-decoration: underline;              /* Underlined to show they're clickable */
+    color: white;                           /* White links by default */
+    text-decoration: underline;               /* Underlined to show they're clickable */
 }
 
 a:hover {
