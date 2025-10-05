@@ -24,7 +24,7 @@
 6. Install required packages:
 
    ```bash
-   pip install flask waitress requests
+   pip install flask waitress requests flask-sqlalchemy
    ```
 
 7. Restart the IIS server
@@ -89,4 +89,28 @@
 
 - **cached_relay.py**: Defines the `CachedMediaRelay` class, which combines the relay and frame caching systems. It provides stable video streaming from unreliable sources by buffering frames and distributing them to clients at a steady rate.
 
-- **waitress_app.py**: Sets up and runs a Waitress WSGI server to serve the Flask web application. It configures logging and ensures the app can be deployed in a production environment. 
+- **waitress_app.py**: Sets up and runs a Waitress WSGI server to serve the Flask web application. It configures logging and ensures the app can be deployed in a production environment.
+
+- **database.py**: Database configuration module that initializes SQLAlchemy for storing visitor location data.
+
+- **geomap_module/**: A Flask blueprint module for tracking and displaying visitor locations on an interactive map.
+  - **models.py**: Defines the `VisitorLocation` database model for storing IP geolocation data
+  - **routes.py**: Provides endpoints for the visitor map page and API endpoints for location data
+  - **helpers.py**: Utility functions for extracting visitor IPs and fetching geolocation data from ipinfo.io
+  - **templates/visitors.html**: Interactive map visualization using Leaflet.js with marker clustering
+
+## Features
+
+### Visitor Tracking Map
+
+The application now includes an automatic visitor tracking system that displays where visitors are connecting from on an interactive world map:
+
+- **Automatic Tracking**: Every visitor's location is automatically logged based on their IP address (respects 1-hour cooldown per IP)
+- **Interactive Map**: Uses Leaflet.js with marker clustering for clean visualization
+- **Statistics**: Shows total visits and unique visitor counts
+- **Recent Visitors**: Displays a table of recent connections with timestamps
+- **Privacy Friendly**: Only stores city/region/country level data, not exact addresses
+- **Free Tier**: Uses ipinfo.io API (50,000 requests/month free tier)
+
+Access the visitor map at: `/aquaponics/visitors`
+ 

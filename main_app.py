@@ -24,6 +24,12 @@ from typing import Dict
 # Local modules that handle pulling frames from upstream cameras
 from cached_relay import CachedMediaRelay
 
+# Database and visitor tracking
+from database import db
+from geomap_module import geomap_bp
+from geomap_module.models import VisitorLocation
+from geomap_module.helpers import get_ip, get_location
+
 # ---------------------------------------------------------------------------
 # LOGGING SETUP
 # ---------------------------------------------------------------------------
@@ -66,6 +72,91 @@ app = Flask(__name__, static_url_path="/aquaponics/static")
 
 # APPLICATION_ROOT allows IIS or reverse proxy to mount at /aquaponics
 app.config["APPLICATION_ROOT"] = os.environ.get("APPL_VIRTUAL_PATH", "/")
+
+# ---------------------------------------------------------------------------
+# DATABASE CONFIGURATION
+# ---------------------------------------------------------------------------
+# Configure SQLite database for visitor tracking
+# Database file will be stored in the application directory
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "visitors.db")
+app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DB_PATH}"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# Initialize the database
+db.init_app(app)
+
+# Register the geomap blueprint for visitor tracking
+app.register_blueprint(geomap_bp, url_prefix="/aquaponics")
+
+# Create database tables if they don't exist
+with app.app_context():
+    db.create_all()
+    logging.info("Database tables created/verified")
+
+# ---------------------------------------------------------------------------
+# VISITOR TRACKING MIDDLEWARE
+# ---------------------------------------------------------------------------
+@app.before_request
+def track_visitor():
+    """
+    Middleware to track visitor IP locations on each request.
+    Runs before every request to log visitor information.
+    Increments visit counter for returning visitors.
+    """
+    # Skip tracking for static files, API endpoints, and health checks
+    if (request.path.startswith('/aquaponics/static/') or 
+        request.path.startswith('/aquaponics/api/') or
+        request.path in ['/aquaponics/health', '/aquaponics/server_info', '/aquaponics/waitress_info'] or
+        request.path == '/aquaponics/stream_proxy'):
+        return
+    
+    try:
+        # Get visitor's IP address
+        ip = get_ip()
+        
+        # Check if we've already tracked this IP
+        from datetime import datetime, timedelta
+        existing_visitor = VisitorLocation.query.filter_by(ip_address=ip).first()
+        
+        if existing_visitor:
+            # Check if we should update (cooldown: 1 hour)
+            recent_cutoff = datetime.utcnow() - timedelta(hours=1)
+            if existing_visitor.last_visit > recent_cutoff:
+                # Already tracked recently, skip
+                return
+            
+            # Update existing visitor: increment counter and update timestamps
+            existing_visitor.increment_visit(
+                page_visited=request.path,
+                user_agent=request.headers.get('User-Agent', '')[:255]
+            )
+            db.session.commit()
+            logging.info(f"Updated visitor from {ip} - Visit #{existing_visitor.visit_count}")
+        else:
+            # New visitor - get location data
+            location_data = get_location(ip)
+            
+            if location_data:
+                # Create new visitor location record
+                visitor = VisitorLocation(
+                    ip_address=ip,
+                    lat=location_data["lat"],
+                    lon=location_data["lon"],
+                    city=location_data.get("city"),
+                    region=location_data.get("region"),
+                    country=location_data.get("country"),
+                    user_agent=request.headers.get('User-Agent', '')[:255],  # Limit length
+                    page_visited=request.path
+                )
+                
+                db.session.add(visitor)
+                db.session.commit()
+                logging.info(f"Tracked new visitor from {ip} - {location_data.get('city', 'Unknown')}")
+    except Exception as e:
+        # Don't let visitor tracking errors break the application
+        logging.error(f"Error tracking visitor: {e}")
+        # Rollback any failed database transaction
+        db.session.rollback()
 
 # ---------------------------------------------------------------------------
 # CAMERA CONFIGURATION
