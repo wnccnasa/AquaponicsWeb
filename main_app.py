@@ -14,18 +14,19 @@ Does NOT include extra debug endpoints or complex UI logic.
 """
 
 from flask import Flask, render_template, request, url_for, Response
+from flask_sqlalchemy import SQLAlchemy
 import os
 import logging
 import logging.handlers
 import threading
 import time
 from typing import Dict
-
+from datetime import datetime, timedelta, timezone
 # Local modules that handle pulling frames from upstream cameras
 from cached_relay import CachedMediaRelay
 
 # Database and visitor tracking
-from database import db
+from database import db  # <-- db is already created in database.py
 from geomap_module import geomap_bp
 from geomap_module.models import VisitorLocation
 from geomap_module.helpers import get_ip, get_location
@@ -74,15 +75,15 @@ app = Flask(__name__, static_url_path="/aquaponics/static")
 app.config["APPLICATION_ROOT"] = os.environ.get("APPL_VIRTUAL_PATH", "/")
 
 # ---------------------------------------------------------------------------
-# DATABASE CONFIGURATION
+# DATABASE SETUP (moved to static/db directory)
 # ---------------------------------------------------------------------------
-# Configure SQLite database for visitor tracking
-# Database file will be stored in the application directory
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "visitors.db")
-app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DB_PATH}"
+# Use absolute path instead of app.static_folder to avoid initialization order issues
+DB_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "db")
+os.makedirs(DB_DIR, exist_ok=True)
+app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{os.path.join(DB_DIR, 'visitors.db')}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-# Initialize the database
+# Initialize the database with this app (don't create a new SQLAlchemy instance)
 db.init_app(app)
 
 # Register the geomap blueprint for visitor tracking
@@ -96,6 +97,12 @@ with app.app_context():
 # ---------------------------------------------------------------------------
 # VISITOR TRACKING MIDDLEWARE
 # ---------------------------------------------------------------------------
+# TEMPORARILY DISABLED FOR DEBUGGING
+# @app.before_request
+# def track_visitor():
+#     """Visitor tracking temporarily disabled"""
+#     pass
+
 @app.before_request
 def track_visitor():
     """
@@ -110,19 +117,25 @@ def track_visitor():
         request.path == '/aquaponics/stream_proxy'):
         return
     
+    # Add debug logging (in MDT for local viewing)
+    mdt_offset = timedelta(hours=-6)  # MDT is UTC-6
+    now_mdt = datetime.now(timezone.utc) + mdt_offset
+    logging.info(f"[{now_mdt.strftime('%Y-%m-%d %H:%M:%S MDT')}] Visitor tracking triggered for path: {request.path}")
+    
     try:
         # Get visitor's IP address
         ip = get_ip()
+        logging.info(f"Detected IP: {ip}")
         
         # Check if we've already tracked this IP
-        from datetime import datetime, timedelta
         existing_visitor = VisitorLocation.query.filter_by(ip_address=ip).first()
         
         if existing_visitor:
             # Check if we should update (cooldown: 1 hour)
-            recent_cutoff = datetime.utcnow() - timedelta(hours=1)
+            recent_cutoff = datetime.now(timezone.utc) - timedelta(hours=1)
             if existing_visitor.last_visit > recent_cutoff:
                 # Already tracked recently, skip
+                logging.info(f"Visitor {ip} tracked recently, skipping")
                 return
             
             # Update existing visitor: increment counter and update timestamps
@@ -134,7 +147,9 @@ def track_visitor():
             logging.info(f"Updated visitor from {ip} - Visit #{existing_visitor.visit_count}")
         else:
             # New visitor - get location data
+            logging.info(f"New visitor {ip}, fetching location data...")
             location_data = get_location(ip)
+            logging.info(f"Location data received: {location_data}")
             
             if location_data:
                 # Create new visitor location record
@@ -145,16 +160,18 @@ def track_visitor():
                     city=location_data.get("city"),
                     region=location_data.get("region"),
                     country=location_data.get("country"),
-                    user_agent=request.headers.get('User-Agent', '')[:255],  # Limit length
+                    user_agent=request.headers.get('User-Agent', '')[:255],
                     page_visited=request.path
                 )
                 
                 db.session.add(visitor)
                 db.session.commit()
-                logging.info(f"Tracked new visitor from {ip} - {location_data.get('city', 'Unknown')}")
+                logging.info(f"Successfully tracked new visitor from {ip} - {location_data.get('city', 'Unknown')}, {location_data.get('region', '')}")
+            else:
+                logging.warning(f"No location data returned for IP: {ip}")
     except Exception as e:
         # Don't let visitor tracking errors break the application
-        logging.error(f"Error tracking visitor: {e}")
+        logging.error(f"Error tracking visitor: {e}", exc_info=True)
         # Rollback any failed database transaction
         db.session.rollback()
 
@@ -378,6 +395,43 @@ def waitress_info():
         "threads_other": len(all_threads) - len(waitress_threads),
         "relays": relay_stats
     }
+
+@app.route("/aquaponics/debug/visitors")
+def debug_visitors():
+    """Debug endpoint to check visitor data (timestamps in MDT)."""
+    try:
+        mdt_offset = timedelta(hours=-6)  # MDT is UTC-6
+        visitors = VisitorLocation.query.order_by(VisitorLocation.first_visit.desc()).limit(20).all()
+        
+        def to_mdt(utc_dt):
+            if utc_dt is None:
+                return None
+            # Handle both naive and timezone-aware datetimes
+            if utc_dt.tzinfo is None:
+                utc_dt = utc_dt.replace(tzinfo=timezone.utc)
+            return (utc_dt + mdt_offset).strftime('%Y-%m-%d %H:%M:%S MDT')
+        
+        return {
+            "total_count": VisitorLocation.query.count(),
+            "timezone": "Mountain Daylight Time (MDT, UTC-6)",
+            "recent_visitors": [
+                {
+                    "ip": v.ip_address,
+                    "city": v.city,
+                    "region": v.region,
+                    "country": v.country,
+                    "lat": v.lat,
+                    "lon": v.lon,
+                    "visits": v.visit_count,
+                    "last_visit": to_mdt(v.last_visit),
+                    "first_visit": to_mdt(v.first_visit)
+                }
+                for v in visitors
+            ]
+        }
+    except Exception as e:
+        import traceback
+        return {"error": str(e), "traceback": traceback.format_exc()}, 500
 
 # ---------------------------------------------------------------------------
 # TEMPLATE CONTEXT

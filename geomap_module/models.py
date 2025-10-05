@@ -1,5 +1,5 @@
 from database import db  # Import the shared db instance
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 class VisitorLocation(db.Model):
@@ -14,8 +14,8 @@ class VisitorLocation(db.Model):
     region = db.Column(db.String(100))
     country = db.Column(db.String(100))
     visit_count = db.Column(db.Integer, default=1, nullable=False)  # Counter for number of visits
-    first_visit = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)  # First visit timestamp
-    last_visit = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)  # Most recent visit timestamp
+    first_visit = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)  # First visit timestamp
+    last_visit = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)  # Most recent visit timestamp
     user_agent = db.Column(db.String(255))
     page_visited = db.Column(db.String(255))  # Last page visited
 
@@ -27,15 +27,15 @@ class VisitorLocation(db.Model):
         self.region = region
         self.country = country
         self.visit_count = 1
-        self.first_visit = datetime.utcnow()
-        self.last_visit = datetime.utcnow()
+        self.first_visit = datetime.now(timezone.utc)
+        self.last_visit = datetime.now(timezone.utc)
         self.user_agent = user_agent
         self.page_visited = page_visited
 
     def increment_visit(self, page_visited=None, user_agent=None):
         """Increment the visit counter and update last visit timestamp."""
         self.visit_count += 1
-        self.last_visit = datetime.utcnow()
+        self.last_visit = datetime.now(timezone.utc)
         if page_visited:
             self.page_visited = page_visited
         if user_agent:
