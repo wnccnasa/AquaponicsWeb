@@ -53,10 +53,10 @@ try:
         LOG_FILE,
         when="midnight",
         interval=1,
-        backupCount=7,
+        backupCount=14,
         encoding="utf-8"
     )
-    handler.suffix = "%Y-%m-%d"
+    handler.suffix = "%Y-%m-%d.log"
     # use MountainFormatter so logs are in Mountain time
     handler.setFormatter(MountainFormatter("%(asctime)s %(levelname)s %(message)s"))
     

@@ -53,20 +53,44 @@ from geomap_module.routes import VISITOR_COOLDOWN_HOURS
 # Change logging file name to use explicit "main_app.log" base and cleaner rotated suffix
 LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
 os.makedirs(LOG_DIR, exist_ok=True)
-
 LOG_FILE = os.path.join(LOG_DIR, "main_app.log")
 
+# Configure logging with TimedRotatingFileHandler
 handler = logging.handlers.TimedRotatingFileHandler(
-    LOG_FILE, when="midnight", interval=1, backupCount=7, encoding="utf-8"
+    LOG_FILE,
+    when="midnight",
+    interval=1,
+    backupCount=14,
+    encoding="utf-8"
 )
-# rotated files will be: main_app.log.2025-09-27 (no duplicate .log)
-handler.suffix = "%Y-%m-%d"
-handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+handler.suffix = "%Y-%m-%d.log"
 
-# Root logger (shared across modules)
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-logger.addHandler(handler)
+try:
+    from zoneinfo import ZoneInfo
+    MOUNTAIN_TZ = ZoneInfo("America/Denver")
+except ImportError:
+    try:
+        from backports.zoneinfo import ZoneInfo
+        MOUNTAIN_TZ = ZoneInfo("America/Denver")
+    except ImportError:
+        from datetime import timezone, timedelta
+        MOUNTAIN_TZ = timezone(timedelta(hours=-6))
+        logging.warning("zoneinfo not available, using fixed UTC-6 offset")
+
+class MountainFormatter(logging.Formatter):
+    def formatTime(self, record, datefmt=None):
+        dt = datetime.fromtimestamp(record.created, MOUNTAIN_TZ)
+        if datefmt:
+            return dt.strftime(datefmt)
+        return dt.strftime("%Y-%m-%d %H:%M:%S %Z")
+
+handler.setFormatter(MountainFormatter("%(asctime)s %(levelname)s %(message)s"))
+
+logging.basicConfig(
+    level=logging.INFO,
+    handlers=[handler]
+)
+
 logging.info("Application start")
 
 # ---------------------------------------------------------------------------
