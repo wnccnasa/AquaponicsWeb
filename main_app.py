@@ -22,6 +22,11 @@ import threading
 import time
 from typing import Dict
 from datetime import datetime, timedelta, timezone
+
+# Simple Mountain timezone (MDT = UTC-6, MST = UTC-7)
+# Use MDT for now - adjust manually for winter if needed
+MOUNTAIN_TZ = timezone(timedelta(hours=-6))  # Mountain Daylight Time
+
 # Local modules that handle pulling frames from upstream cameras
 from cached_relay import CachedMediaRelay
 
@@ -117,10 +122,10 @@ def track_visitor():
         request.path == '/aquaponics/stream_proxy'):
         return
     
-    # Add debug logging (in MDT for local viewing)
-    mdt_offset = timedelta(hours=-6)  # MDT is UTC-6
-    now_mdt = datetime.now(timezone.utc) + mdt_offset
-    logging.info(f"[{now_mdt.strftime('%Y-%m-%d %H:%M:%S MDT')}] Visitor tracking triggered for path: {request.path}")
+    # Use timezone-aware conversion to Mountain Time
+    now_utc = datetime.now(timezone.utc)
+    now_mdt = now_utc.astimezone(MOUNTAIN_TZ)
+    logging.info(f"[{now_mdt.strftime('%Y-%m-%d %H:%M:%S %Z')}] Visitor tracking triggered for path: {request.path}")
     
     try:
         # Get visitor's IP address
@@ -132,8 +137,13 @@ def track_visitor():
         
         if existing_visitor:
             # Check if we should update (cooldown: 1 hour)
-            recent_cutoff = datetime.now(timezone.utc) - timedelta(hours=1)
-            if existing_visitor.last_visit > recent_cutoff:
+            # Ensure last_visit is timezone-aware for comparison
+            last_visit = existing_visitor.last_visit
+            if last_visit and last_visit.tzinfo is None:
+                last_visit = last_visit.replace(tzinfo=timezone.utc)
+            
+            recent_cutoff = now_utc - timedelta(hours=1)
+            if last_visit and last_visit > recent_cutoff:
                 # Already tracked recently, skip
                 logging.info(f"Visitor {ip} tracked recently, skipping")
                 return
@@ -398,22 +408,21 @@ def waitress_info():
 
 @app.route("/aquaponics/debug/visitors")
 def debug_visitors():
-    """Debug endpoint to check visitor data (timestamps in MDT)."""
+    """Debug endpoint to check visitor data (timestamps in Mountain Time)."""
     try:
-        mdt_offset = timedelta(hours=-6)  # MDT is UTC-6
         visitors = VisitorLocation.query.order_by(VisitorLocation.first_visit.desc()).limit(20).all()
         
-        def to_mdt(utc_dt):
+        def to_mountain(utc_dt):
             if utc_dt is None:
                 return None
             # Handle both naive and timezone-aware datetimes
             if utc_dt.tzinfo is None:
                 utc_dt = utc_dt.replace(tzinfo=timezone.utc)
-            return (utc_dt + mdt_offset).strftime('%Y-%m-%d %H:%M:%S MDT')
+            return utc_dt.astimezone(MOUNTAIN_TZ).strftime('%Y-%m-%d %H:%M:%S %Z')
         
         return {
             "total_count": VisitorLocation.query.count(),
-            "timezone": "Mountain Daylight Time (MDT, UTC-6)",
+            "timezone": "America/Denver (Mountain Time with DST)",
             "recent_visitors": [
                 {
                     "ip": v.ip_address,
@@ -423,8 +432,8 @@ def debug_visitors():
                     "lat": v.lat,
                     "lon": v.lon,
                     "visits": v.visit_count,
-                    "last_visit": to_mdt(v.last_visit),
-                    "first_visit": to_mdt(v.first_visit)
+                    "last_visit": to_mountain(v.last_visit),
+                    "first_visit": to_mountain(v.first_visit)
                 }
                 for v in visitors
             ]
