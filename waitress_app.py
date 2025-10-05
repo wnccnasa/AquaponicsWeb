@@ -8,6 +8,7 @@ from main_app import app
 import os
 from sys import stdout, path
 import logging
+from datetime import datetime
 
 # Add current directory to path to ensure imports work
 path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -33,18 +34,32 @@ try:
     for handler in logger.handlers[:]:
         logger.removeHandler(handler)
     
+    try:
+        from zoneinfo import ZoneInfo
+    except ImportError:
+        from backports.zoneinfo import ZoneInfo
+
+    MOUNTAIN_TZ = ZoneInfo("America/Denver")
+
+    class MountainFormatter(logging.Formatter):
+        def formatTime(self, record, datefmt=None):
+            dt = datetime.fromtimestamp(record.created, MOUNTAIN_TZ)
+            if datefmt:
+                return dt.strftime(datefmt)
+            return dt.strftime("%Y-%m-%d %H:%M:%S %Z")
+
     # Use TimedRotatingFileHandler so rotated files are waitress_app.log, waitress_app.log.2025-08-19, etc.
     handler = logging.handlers.TimedRotatingFileHandler(
-        LOG_FILE, when="midnight", interval=1, backupCount=7, encoding="utf-8"
+        LOG_FILE,
+        when="midnight",
+        interval=1,
+        backupCount=7,
+        encoding="utf-8"
     )
-    
-    # Rotated name format: waitress_app.log.2025-08-19
     handler.suffix = "%Y-%m-%d"
-    import re
-    handler.extMatch = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+    # use MountainFormatter so logs are in Mountain time
+    handler.setFormatter(MountainFormatter("%(asctime)s %(levelname)s %(message)s"))
     
-    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-    handler.setFormatter(formatter)
     logger.addHandler(handler)
     
     # Prevent this logger from propagating to root logger (which main_app might control)

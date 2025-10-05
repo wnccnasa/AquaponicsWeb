@@ -433,6 +433,19 @@ def debug_visitors():
         import traceback
         return {"error": str(e), "traceback": traceback.format_exc()}, 500
 
+@app.route("/aquaponics/debug/request_info")
+def debug_request_info():
+    """Return headers and environ to help verify forwarded IPs under IIS."""
+    from geomap_module.helpers import get_ip
+    return {
+        "detected_ip": get_ip(),
+        "remote_addr": request.remote_addr,
+        "environ_remote_addr": request.environ.get("REMOTE_ADDR"),
+        "headers": {k: v for k, v in request.headers.items()},
+        "x_forwarded_for": request.headers.get("X-Forwarded-For"),
+        "x_real_ip": request.headers.get("X-Real-IP"),
+    }
+
 # ---------------------------------------------------------------------------
 # TEMPLATE CONTEXT
 # ---------------------------------------------------------------------------

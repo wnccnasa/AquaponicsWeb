@@ -1,46 +1,44 @@
 from flask import request
 import logging
 
-def get_ip():
-    """
-    Get the visitor's real IP address.
-    Checks X-Forwarded-For header first (for reverse proxy setups like IIS).
-    """
-    # Check X-Forwarded-For header (IIS/reverse proxy)
-    if request.headers.get('X-Forwarded-For'):
-        ip = request.headers.get('X-Forwarded-For').split(',')[0].strip()
-        return ip
-    
-    # Check X-Real-IP header
-    if request.headers.get('X-Real-IP'):
-        return request.headers.get('X-Real-IP').strip()
-    
-    # Fallback to direct connection IP
-    return request.remote_addr
+PRIVATE_PREFIXES = ("10.", "172.", "192.168.", "127.", "169.254.")
 
-def get_location(ip):
+def _is_private(ip: str) -> bool:
+    if not ip:
+        return True
+    ip = ip.strip().lower()
+    if ip == "localhost":
+        return True
+    return any(ip.startswith(p) for p in PRIVATE_PREFIXES)
+
+def get_ip() -> str:
     """
-    Get geolocation data for an IP address.
-    Returns None for localhost/private IPs or on error.
+    Prefer headers set by URL Rewrite / proxy, then fall back to REMOTE_ADDR / request.remote_addr.
     """
-    # Skip localhost/private IPs
-    if ip in ['127.0.0.1', 'localhost'] or ip.startswith('192.168.') or ip.startswith('10.') or ip.startswith('172.'):
-        logging.info(f"Skipping geolocation for private IP: {ip}")
+    hdr = request.headers.get
+    for h in ("X-Real-Ip", "X-Real-IP", "X-Forwarded-For", "X-MS-Forwarded-Client-IP"):
+        v = hdr(h)
+        if v:
+            return v.split(",")[0].strip()
+    return request.environ.get("REMOTE_ADDR") or request.remote_addr
+
+def get_location(ip: str):
+    if _is_private(ip):
+        logging.info("Skipping geolocation for private IP: %s", ip)
         return None
-    
     try:
         import requests
-        response = requests.get(f'https://ipapi.co/{ip}/json/', timeout=5)
-        if response.status_code == 200:
-            data = response.json()
+        r = requests.get(f"https://ipapi.co/{ip}/json/", timeout=5)
+        if r.status_code == 200:
+            d = r.json()
             return {
-                "lat": data.get("latitude"),
-                "lon": data.get("longitude"),
-                "city": data.get("city"),
-                "region": data.get("region"),
-                "country": data.get("country_name")
+                "lat": d.get("latitude"),
+                "lon": d.get("longitude"),
+                "city": d.get("city"),
+                "region": d.get("region"),
+                "country": d.get("country_name"),
             }
-    except Exception as e:
-        logging.error(f"Error fetching location for {ip}: {e}")
-    
+        logging.warning("Geolocation lookup returned %s for %s", r.status_code, ip)
+    except Exception:
+        logging.exception("Geolocation lookup failed for %s", ip)
     return None
