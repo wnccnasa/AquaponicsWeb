@@ -1,31 +1,23 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="row">
-        <div class="col-12">
-            <h1 class="text-center mb-4">🌍 Visitor Locations Map</h1>
-            <p class="text-center text-muted mb-4">
-                See where visitors to the WNCC Aquaponics project are connecting from around the world!
-            </p>
-        </div>
-    </div>
-
+<div class="container">
+    <h1>🌍 Visitor Locations Map</h1>
     <!-- Statistics Cards -->
     <div class="row mb-4">
-        <div class="col-md-6 mb-3">
+        <div class="col-md-6">
             <div class="card text-center">
                 <div class="card-body">
                     <h5 class="card-title">Total Visits</h5>
-                    <p class="card-text display-4" id="total-visitors">{{ total_visitors }}</p>
+                    <p class="card-text display-5" id="total-visitors">{{ total_visitors }}</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-6 mb-3">
+        <div class="col-md-6">
             <div class="card text-center">
                 <div class="card-body">
                     <h5 class="card-title">Unique Visitors</h5>
-                    <p class="card-text display-4" id="unique-visitors">{{ unique_visitors }}</p>
+                    <p class="card-text display-5" id="unique-visitors">{{ unique_visitors }}</p>
                 </div>
             </div>
         </div>
@@ -141,7 +133,7 @@
             locations.forEach(loc => {
                 if (loc.lat !== null && loc.lon !== null) {
                     const marker = L.marker([loc.lat, loc.lon]);
-                    
+
                     // Create popup content with visit count
                     const visitText = loc.visit_count === 1 ? '1 visit' : `${loc.visit_count} visits`;
                     const popupContent = `
@@ -154,7 +146,7 @@
                             <small><strong>Last:</strong> ${new Date(loc.last_visit).toLocaleString()}</small>
                         </div>
                     `;
-                    
+
                     marker.bindPopup(popupContent);
                     markers.addLayer(marker);
                 }
@@ -190,10 +182,10 @@
                 const row = document.createElement('tr');
                 const location = `${visitor.city || 'Unknown'}, ${visitor.region || ''} ${visitor.country || ''}`.trim();
                 const time = new Date(visitor.last_visit).toLocaleString();
-                const visitBadge = visitor.visit_count > 1 
-                    ? `<span class="badge bg-primary">${visitor.visit_count}</span>` 
+                const visitBadge = visitor.visit_count > 1
+                    ? `<span class="badge bg-primary">${visitor.visit_count}</span>`
                     : visitor.visit_count;
-                
+
                 row.innerHTML = `
                     <td>${location}</td>
                     <td class="text-center">${visitBadge}</td>
@@ -217,7 +209,7 @@
                 const rank = index + 1;
                 const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
                 const visitBadge = `<span class="badge bg-success">${visitor.visit_count}</span>`;
-                
+
                 row.innerHTML = `
                     <td class="text-center">${medal}</td>
                     <td>${location}</td>
@@ -246,6 +238,7 @@
     .marker-cluster-small {
         background-color: rgba(181, 226, 140, 0.6);
     }
+
     .marker-cluster-small div {
         background-color: rgba(110, 204, 57, 0.6);
     }
@@ -253,6 +246,7 @@
     .marker-cluster-medium {
         background-color: rgba(241, 211, 87, 0.6);
     }
+
     .marker-cluster-medium div {
         background-color: rgba(240, 194, 12, 0.6);
     }
@@ -260,13 +254,14 @@
     .marker-cluster-large {
         background-color: rgba(253, 156, 115, 0.6);
     }
+
     .marker-cluster-large div {
         background-color: rgba(241, 128, 23, 0.6);
     }
 
     /* Make cards look nicer */
     .card {
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         border: none;
     }
 </style>
