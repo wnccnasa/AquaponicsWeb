@@ -6,6 +6,9 @@ from database import db  # Import db from the shared database module
 import logging
 from datetime import datetime, timezone, timedelta
 
+# Visitor tracking configuration
+VISITOR_COOLDOWN_HOURS = 1  # Time in hours before same IP is tracked again
+
 # Try to use proper timezone support with DST awareness
 try:
     from zoneinfo import ZoneInfo

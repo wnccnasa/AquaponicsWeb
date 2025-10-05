@@ -33,6 +33,7 @@ from database import db  # <-- db is already created in database.py
 from geomap_module import geomap_bp
 from geomap_module.models import VisitorLocation
 from geomap_module.helpers import get_ip, get_location
+from geomap_module.routes import VISITOR_COOLDOWN_HOURS
 
 # ---------------------------------------------------------------------------
 # LOGGING SETUP
@@ -133,12 +134,12 @@ def track_visitor():
         existing_visitor = VisitorLocation.query.filter_by(ip_address=ip).first()
         
         if existing_visitor:
-            # Check if we should update (cooldown: 1 hour)
+            # Check if we should update (cooldown period)
             last_visit = existing_visitor.last_visit
             if last_visit and last_visit.tzinfo is None:
                 last_visit = last_visit.replace(tzinfo=timezone.utc)
             
-            recent_cutoff = now_utc - timedelta(hours=1)
+            recent_cutoff = now_utc - timedelta(hours=VISITOR_COOLDOWN_HOURS)
             if last_visit and last_visit > recent_cutoff:
                 logging.info(f"Visitor {ip} tracked recently, skipping")
                 return
