@@ -4,33 +4,30 @@ from datetime import datetime, timezone
 
 class VisitorLocation(db.Model):
     """Model to store visitor IP location data."""
-    __tablename__ = 'visitor_locations'
+    __tablename__ = 'visitor_location'
     
     id = db.Column(db.Integer, primary_key=True)
-    ip_address = db.Column(db.String(45), nullable=False, unique=True, index=True)  # IPv6 can be up to 45 chars
-    lat = db.Column(db.Float, nullable=False)
-    lon = db.Column(db.Float, nullable=False)
+    ip_address = db.Column(db.String(45), unique=True, nullable=False)
+    lat = db.Column(db.Float, nullable=False, default=0.0)
+    lon = db.Column(db.Float, nullable=False, default=0.0)
     city = db.Column(db.String(100))
     region = db.Column(db.String(100))
     country = db.Column(db.String(100))
-    visit_count = db.Column(db.Integer, default=1, nullable=False)  # Counter for number of visits
-    first_visit = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)  # First visit timestamp
-    last_visit = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)  # Most recent visit timestamp
+    
+    # New fields from ipgeolocation.io
+    country_code = db.Column(db.String(10))
+    continent = db.Column(db.String(50))
+    zipcode = db.Column(db.String(20))
+    isp = db.Column(db.String(200))
+    organization = db.Column(db.String(200))
+    timezone = db.Column(db.String(50))
+    currency = db.Column(db.String(10))
+    
+    visit_count = db.Column(db.Integer, default=1)
+    first_visit = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    last_visit = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     user_agent = db.Column(db.String(255))
-    page_visited = db.Column(db.String(255))  # Last page visited
-
-    def __init__(self, ip_address, lat, lon, city=None, region=None, country=None, user_agent=None, page_visited=None):
-        self.ip_address = ip_address
-        self.lat = lat
-        self.lon = lon
-        self.city = city
-        self.region = region
-        self.country = country
-        self.visit_count = 1
-        self.first_visit = datetime.now(timezone.utc)
-        self.last_visit = datetime.now(timezone.utc)
-        self.user_agent = user_agent
-        self.page_visited = page_visited
+    page_visited = db.Column(db.String(255))
 
     def increment_visit(self, page_visited=None, user_agent=None):
         """Increment the visit counter and update last visit timestamp."""
@@ -57,3 +54,6 @@ class VisitorLocation(db.Model):
             'user_agent': self.user_agent,
             'page_visited': self.page_visited
         }
+
+    def __repr__(self):
+        return f'<VisitorLocation {self.ip_address} from {self.city}, {self.country}>'

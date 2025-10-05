@@ -23,9 +23,7 @@ import time
 from typing import Dict
 from datetime import datetime, timedelta, timezone
 
-# Simple Mountain timezone (MDT = UTC-6, MST = UTC-7)
-# Use MDT for now - adjust manually for winter if needed
-MOUNTAIN_TZ = timezone(timedelta(hours=-6))  # Mountain Daylight Time
+# Remove MOUNTAIN_TZ definition - we'll only use UTC for storage
 
 # Local modules that handle pulling frames from upstream cameras
 from cached_relay import CachedMediaRelay
@@ -122,10 +120,9 @@ def track_visitor():
         request.path == '/aquaponics/stream_proxy'):
         return
     
-    # Use timezone-aware conversion to Mountain Time
+    # Store everything in UTC - no timezone conversion here
     now_utc = datetime.now(timezone.utc)
-    now_mdt = now_utc.astimezone(MOUNTAIN_TZ)
-    logging.info(f"[{now_mdt.strftime('%Y-%m-%d %H:%M:%S %Z')}] Visitor tracking triggered for path: {request.path}")
+    logging.info(f"[{now_utc.isoformat()}] Visitor tracking triggered for path: {request.path}")
     
     try:
         # Get visitor's IP address
@@ -137,18 +134,16 @@ def track_visitor():
         
         if existing_visitor:
             # Check if we should update (cooldown: 1 hour)
-            # Ensure last_visit is timezone-aware for comparison
             last_visit = existing_visitor.last_visit
             if last_visit and last_visit.tzinfo is None:
                 last_visit = last_visit.replace(tzinfo=timezone.utc)
             
             recent_cutoff = now_utc - timedelta(hours=1)
             if last_visit and last_visit > recent_cutoff:
-                # Already tracked recently, skip
                 logging.info(f"Visitor {ip} tracked recently, skipping")
                 return
             
-            # Update existing visitor: increment counter and update timestamps
+            # Update existing visitor
             existing_visitor.increment_visit(
                 page_visited=request.path,
                 user_agent=request.headers.get('User-Agent', '')[:255]
@@ -161,28 +156,31 @@ def track_visitor():
             location_data = get_location(ip)
             logging.info(f"Location data received: {location_data}")
             
-            if location_data:
-                # Create new visitor location record
-                visitor = VisitorLocation(
-                    ip_address=ip,
-                    lat=location_data["lat"],
-                    lon=location_data["lon"],
-                    city=location_data.get("city"),
-                    region=location_data.get("region"),
-                    country=location_data.get("country"),
-                    user_agent=request.headers.get('User-Agent', '')[:255],
-                    page_visited=request.path
-                )
-                
-                db.session.add(visitor)
-                db.session.commit()
-                logging.info(f"Successfully tracked new visitor from {ip} - {location_data.get('city', 'Unknown')}, {location_data.get('region', '')}")
-            else:
-                logging.warning(f"No location data returned for IP: {ip}")
+            # Always create visitor record, even if geolocation fails
+            visitor = VisitorLocation(
+                ip_address=ip,
+                lat=location_data.get("lat") if location_data else 0.0,
+                lon=location_data.get("lon") if location_data else 0.0,
+                city=location_data.get("city") if location_data else None,
+                region=location_data.get("region") if location_data else None,
+                country=location_data.get("country") if location_data else None,
+                country_code=location_data.get("country_code") if location_data else None,
+                continent=location_data.get("continent") if location_data else None,
+                zipcode=location_data.get("zipcode") if location_data else None,
+                isp=location_data.get("isp") if location_data else None,
+                organization=location_data.get("organization") if location_data else None,
+                timezone=location_data.get("timezone") if location_data else None,
+                currency=location_data.get("currency") if location_data else None,
+                user_agent=request.headers.get('User-Agent', '')[:255],
+                page_visited=request.path
+            )
+            
+            db.session.add(visitor)
+            db.session.commit()
+            logging.info(f"Successfully tracked new visitor from {ip}")
+            
     except Exception as e:
-        # Don't let visitor tracking errors break the application
         logging.error(f"Error tracking visitor: {e}", exc_info=True)
-        # Rollback any failed database transaction
         db.session.rollback()
 
 # ---------------------------------------------------------------------------
@@ -408,21 +406,30 @@ def waitress_info():
 
 @app.route("/aquaponics/debug/visitors")
 def debug_visitors():
-    """Debug endpoint to check visitor data (timestamps in Mountain Time)."""
+    """Debug endpoint - converts UTC timestamps to Mountain Time for display only."""
     try:
+        # Import zoneinfo here for display conversion only
+        try:
+            from zoneinfo import ZoneInfo
+            MOUNTAIN_TZ = ZoneInfo("America/Denver")
+        except ImportError:
+            from backports.zoneinfo import ZoneInfo
+            MOUNTAIN_TZ = ZoneInfo("America/Denver")
+        
         visitors = VisitorLocation.query.order_by(VisitorLocation.first_visit.desc()).limit(20).all()
         
         def to_mountain(utc_dt):
+            """Convert UTC datetime to Mountain Time for display."""
             if utc_dt is None:
                 return None
-            # Handle both naive and timezone-aware datetimes
             if utc_dt.tzinfo is None:
                 utc_dt = utc_dt.replace(tzinfo=timezone.utc)
             return utc_dt.astimezone(MOUNTAIN_TZ).strftime('%Y-%m-%d %H:%M:%S %Z')
         
         return {
             "total_count": VisitorLocation.query.count(),
-            "timezone": "America/Denver (Mountain Time with DST)",
+            "timezone_display": "America/Denver (Mountain Time)",
+            "timezone_storage": "UTC",
             "recent_visitors": [
                 {
                     "ip": v.ip_address,
@@ -432,8 +439,10 @@ def debug_visitors():
                     "lat": v.lat,
                     "lon": v.lon,
                     "visits": v.visit_count,
-                    "last_visit": to_mountain(v.last_visit),
-                    "first_visit": to_mountain(v.first_visit)
+                    "last_visit_mdt": to_mountain(v.last_visit),
+                    "first_visit_mdt": to_mountain(v.first_visit),
+                    "last_visit_utc": v.last_visit.isoformat() if v.last_visit else None,
+                    "first_visit_utc": v.first_visit.isoformat() if v.first_visit else None
                 }
                 for v in visitors
             ]

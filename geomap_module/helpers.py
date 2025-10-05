@@ -2,6 +2,7 @@ from flask import request
 import logging
 
 PRIVATE_PREFIXES = ("10.", "172.", "192.168.", "127.", "169.254.")
+IPGEOLOCATION_API_KEY = "8b968673a16d49109006c5c40a0b6d84"
 
 def _is_private(ip: str) -> bool:
     if not ip:
@@ -23,22 +24,38 @@ def get_ip() -> str:
     return request.environ.get("REMOTE_ADDR") or request.remote_addr
 
 def get_location(ip: str):
+    """
+    Get geolocation data for an IP address using ipgeolocation.io API.
+    Returns dict with comprehensive location data or None if lookup fails.
+    """
     if _is_private(ip):
         logging.info("Skipping geolocation for private IP: %s", ip)
         return None
+    
     try:
         import requests
-        r = requests.get(f"https://ipapi.co/{ip}/json/", timeout=5)
+        url = f"https://api.ipgeolocation.io/ipgeo?apiKey={IPGEOLOCATION_API_KEY}&ip={ip}"
+        r = requests.get(url, timeout=5)
+        
         if r.status_code == 200:
             d = r.json()
             return {
-                "lat": d.get("latitude"),
-                "lon": d.get("longitude"),
+                "lat": float(d.get("latitude")) if d.get("latitude") else None,
+                "lon": float(d.get("longitude")) if d.get("longitude") else None,
                 "city": d.get("city"),
-                "region": d.get("region"),
+                "region": d.get("state_prov"),
                 "country": d.get("country_name"),
+                "country_code": d.get("country_code2"),
+                "continent": d.get("continent_name"),
+                "zipcode": d.get("zipcode"),
+                "isp": d.get("isp"),
+                "organization": d.get("organization"),
+                "timezone": d.get("time_zone", {}).get("name"),
+                "currency": d.get("currency", {}).get("code"),
             }
-        logging.warning("Geolocation lookup returned %s for %s", r.status_code, ip)
+        else:
+            logging.warning("Geolocation lookup returned %s for %s: %s", r.status_code, ip, r.text)
     except Exception:
         logging.exception("Geolocation lookup failed for %s", ip)
+    
     return None
