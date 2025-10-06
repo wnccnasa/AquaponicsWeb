@@ -2,7 +2,6 @@
 {% block content %}
 <div class="container">
 
-  
   <div class="mb-4">
     <h1 class="mb-2">🚀 WNCC STEM Club - Aquaponics System</h1>
     <p>The WNCC STEM Club meets every Thursday at 4 PM in Room C1.</p>
@@ -13,20 +12,20 @@
     <div class="card-header">🐟 Fish Tank</div>
     <div class="card-body">
       <!-- Restored descriptive text -->
-      <p class="mb-3">Live stream from the Aquaponics system fish tank in the Pit (Student common area). Watch the
-        fish swimming in their habitat!</p>
+      <p class="mb-3">Live stream from the Aquaponics system fish tank in the Pit (Student common area).</p>
       <img id="fish-stream" src="{{ fish_stream_url }}&t={{ timestamp }}"
         style="max-width:100%;border:2px solid #ff6b35;border-radius:6px" alt="Fish Tank Stream">
     </div>
   </div>
 
- <!-- Fish Names -->
+  <!-- Fish Names -->
   <div class="card mb-4">
     <div class="card-header">🐠 Fish Tank Inhabitants</div>
     <div class="card-body">
       <ul class="list-unstyled mb-0">
         <li><strong>Curiosity</strong> — Orange & white comet goldfish. Donor: Sarah Bartlett.</li>
-        <li><strong>Jackson Pollock</strong> — Black & orange calico goldfish (named for his ever-changing patches).</li>
+        <li><strong>Jackson Pollock</strong> — Black & orange calico goldfish (named for his ever-changing patches).
+        </li>
         <li><strong>Todd</strong> — Our oldest, largest goldfish; he speaks for himself.</li>
         <li><strong>Bump Rogers</strong> — Goldfish with fatty lumps (has had them long-term).</li>
         <li><strong>Frodo</strong> &amp; <strong>Sam</strong> — Our classic goldfish twins.</li>
@@ -58,8 +57,6 @@
       <a href="{{ url_for('sensors') }}" class="btn btn-primary btn-lg">View Sensor Dashboard</a>
     </div>
   </div>
-
-
 
 </div>
 
