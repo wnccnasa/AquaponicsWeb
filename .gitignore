@@ -1,3 +1,5 @@
+geoip/
+geolite2-city_update.ps1
 logs/
 
 # Database files
