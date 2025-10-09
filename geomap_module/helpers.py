@@ -1,8 +1,28 @@
 from flask import request
 import logging
 from functools import lru_cache
+import os
 
-IPGEOLOCATION_API_KEY = "8b968673a16d49109006c5c40a0b6d84"
+# Load ipgeolocation API key from file or environment (do NOT hardcode here)
+def _load_api_key():
+    # 1) environment variable
+    key = os.environ.get("GEOIP_LICENSE")
+    if key and key.strip():
+        return key.strip()
+    # 2) file at project root: geoip_license.txt
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    license_path = os.path.join(root, "geoip_license.txt")
+    try:
+        if os.path.exists(license_path):
+            with open(license_path, "r", encoding="utf-8") as f:
+                k = f.read().strip()
+                if k:
+                    return k
+    except Exception:
+        logging.exception("Failed to read geoip_license.txt")
+    return None
+
+IPGEOLOCATION_API_KEY = _load_api_key()
 GEOIP_DB_PATH = r"C:\inetpub\aquaponics\geoip\GeoLite2-City.mmdb"
 PRIVATE_PREFIXES = ("10.", "172.", "192.168.", "127.", "169.254.")
 
@@ -80,27 +100,30 @@ def get_location(ip: str):
 
     # 2) ipgeolocation.io
     try:
-        import requests
-        url = f"https://api.ipgeolocation.io/ipgeo?apiKey={IPGEOLOCATION_API_KEY}&ip={ip}"
-        r = requests.get(url, timeout=5)
-        if r.ok:
-            d = r.json()
-            return {
-                "lat": float(d.get("latitude")) if d.get("latitude") else None,
-                "lon": float(d.get("longitude")) if d.get("longitude") else None,
-                "city": _norm(d.get("city")),
-                "region": _norm(d.get("state_prov")),
-                "country": _norm(d.get("country_name")),
-                "country_code": _norm(d.get("country_code2")),
-                "continent": _norm(d.get("continent_name")),
-                "zipcode": _norm(d.get("zipcode")),
-                "isp": _norm(d.get("isp")),
-                "organization": _norm(d.get("organization")),
-                "timezone": (d.get("time_zone") or {}).get("name") if isinstance(d.get("time_zone"), dict) else _norm(d.get("time_zone")),
-                "currency": (d.get("currency") or {}).get("code") if isinstance(d.get("currency"), dict) else None,
-            }
+        if IPGEOLOCATION_API_KEY:
+            import requests
+            url = f"https://api.ipgeolocation.io/ipgeo?apiKey={IPGEOLOCATION_API_KEY}&ip={ip}"
+            r = requests.get(url, timeout=5)
+            if r.ok:
+                d = r.json()
+                return {
+                    "lat": float(d.get("latitude")) if d.get("latitude") else None,
+                    "lon": float(d.get("longitude")) if d.get("longitude") else None,
+                    "city": _norm(d.get("city")),
+                    "region": _norm(d.get("state_prov")),
+                    "country": _norm(d.get("country_name")),
+                    "country_code": _norm(d.get("country_code2")),
+                    "continent": _norm(d.get("continent_name")),
+                    "zipcode": _norm(d.get("zipcode")),
+                    "isp": _norm(d.get("isp")),
+                    "organization": _norm(d.get("organization")),
+                    "timezone": (d.get("time_zone") or {}).get("name") if isinstance(d.get("time_zone"), dict) else _norm(d.get("time_zone")),
+                    "currency": (d.get("currency") or {}).get("code") if isinstance(d.get("currency"), dict) else None,
+                }
+            else:
+                logging.warning("ipgeolocation lookup failed %s for %s: %s", r.status_code, ip, r.text)
         else:
-            logging.warning("ipgeolocation lookup failed %s for %s: %s", r.status_code, ip, r.text)
+            logging.debug("IP geolocation API key not available; skipping ipgeolocation.io lookup")
     except Exception:
         logging.exception("ipgeolocation lookup error for %s", ip)
 

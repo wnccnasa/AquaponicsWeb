@@ -14,7 +14,6 @@ Does NOT include extra debug endpoints or complex UI logic.
 """
 
 from flask import Flask, render_template, request, url_for, Response
-from flask_sqlalchemy import SQLAlchemy
 import os
 import logging
 import logging.handlers
@@ -22,8 +21,6 @@ import threading
 import time
 from typing import Dict
 from datetime import datetime, timedelta, timezone
-
-# Remove MOUNTAIN_TZ definition - we'll only use UTC for storage
 
 # Local modules that handle pulling frames from upstream cameras
 from cached_relay import CachedMediaRelay

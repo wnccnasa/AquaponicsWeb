@@ -6,7 +6,7 @@ to serve a Flask web application.
 
 from main_app import app
 import os
-from sys import stdout, path
+from sys import path
 import logging
 from datetime import datetime
 

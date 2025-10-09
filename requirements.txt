@@ -1,12 +1,12 @@
 # Core web framework
-Flask==3.0.0
+Flask>=3.0.0
 
 # WSGI server for production deployment
-waitress==2.1.2
+waitress>=2.1.2
 
 # HTTP requests library for fetching camera streams and geolocation data
-requests==2.31.0
+requests>=2.31.0
 
 # Database ORM for visitor tracking
-Flask-SQLAlchemy==3.1.1
-SQLAlchemy==2.0.23
+Flask-SQLAlchemy>=3.1.1
+SQLAlchemy>=2.0.23
