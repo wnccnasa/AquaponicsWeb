@@ -1,5 +1,4 @@
 geoip/
-geolite2-city_update.ps1
 logs/
 
 # Database files
@@ -216,5 +215,5 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
-# Local GeoIP license file (contains secret)
+# Local GeoIP license file (contains secret) - DO NOT COMMIT
 geoip_license.txt
