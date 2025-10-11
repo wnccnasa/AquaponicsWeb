@@ -180,3 +180,9 @@ def get_visitor_stats():
     except Exception as e:
         logging.exception("Error fetching visitor stats")
         return jsonify({"error": str(e)}), 500
+
+
+@geomap_bp.route("/photos_nasa")
+def photos_nasa():
+    """Render the NASA photo gallery page."""
+    return render_template("photos_nasa.html")
